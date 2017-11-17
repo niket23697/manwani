@@ -345,10 +345,10 @@ footer{
       <li class="nav-item">
         <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>
       </li>
-      {% endif %}
+      {% endif %}<!-- 
       <li class="nav-item">
         <a class="nav-link" href="/">About Us</a>
-      </li>
+      </li> -->
     </ul>
     <ul class="navbar-nav ml-auto">
       {% if request.user.is_authenticated %}
@@ -450,11 +450,11 @@ footer{
 				<h3><span>Manwani Traders</span></h3>
 
 				<p class="footer-links">
-					<a href="#">Home</a>
-					.
-					<a href="#">Contact Us</a>
-					.
-					<a href="#">About Us</a>
+					<a href="{% url 'home' %}">Home</a>
+					-
+					<a href="{% url 'shop' %}">Shop</a>
+					-
+					<a href="{% url 'contact' %}">Contact Us</a>
 				</p>
 
 				<p class="footer-company-name">Manwani Traders &copy;</p>
@@ -482,7 +482,7 @@ footer{
 			<div class="footer-right">
 
 				<p class="footer-company-about">
-					<span>About the company</span>
+					<span>About Us</span>
 					Lorem ipsum dolor sit amet, consectateur adispicing elit. Fusce euismod convallis velit, eu auctor lacus vehicula sit amet.
 				</p>
 
