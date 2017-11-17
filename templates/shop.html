@@ -11,8 +11,8 @@
 	<h2 style="text-align: center">Browse our shelves</h2>
 	{% for cat in inventory %}
 		<h5>{{cat.0}}</h5>
-		<table style="width: 80%; text-align: center; margin-left: auto; margin-right: auto;">
-			<tr>
+		<table style="width: 80%; text-align: center; margin-left: auto; margin-right: auto;" class="table table-hover table-condensed">
+			<tr class="info">
 				<th>Batch No.</th>
 				<th>Name</th>
 				<th>Price</th>
@@ -43,7 +43,7 @@
 					{% else %}
 					<td>
 						<form action="/add_to_cart/" method="GET">
-							<input type="number" name="quantity" min="1" max="{{item.7}}">
+							<input type="number" name="quantity" min="1" max="{{item.7}}" required="">
 							<input type="hidden" name="batch_no" value="{{item.0}}">	
 							<button type="submit" class="btn">Add to cart</button>
 						</form></td>

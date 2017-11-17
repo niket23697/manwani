@@ -29,12 +29,12 @@
   		<div class="form-group">
     		<label class="control-label col-sm-2" for="username">Total:</label>
     		<div class="col-sm-10">
-      			<input type="text" name="total" class="form-control" value="{{order.2}}" id="total" placeholder="Username" readonly>
+      			<input type="text" name="total" class="form-control" value="{{order.2}}" id="total" placeholder="Total" readonly>
     		</div>
  		</div>
 	</form>
 
-	<table>
+	<table style="width: 80%; text-align: center; margin-left: auto; margin-right: auto;" class="table table-hover table-condensed">
 		<tr>
 			<th>Name</th>
 			<th>Category</th>
@@ -49,16 +49,37 @@
 			<td>{{item.2}}</td>
 			<td>{{item.3}}</td>
 			<td>{{item.4}}</td>
+			<form action="{% url 'plus' %}" method="POST">
+				{% csrf_token %}
+				<td>
+					<input type="hidden" name="ret_rec_id" value="{{order.0}}">
+					<input type="hidden" name="batch_no" value="{{item.0}}">
+					<input type="hidden" name="price" value="{{item.3}}">
+					<button type="submit" class="btn btn-success" style="width: 80%">+</button>
+				</td>
+			</form>
+			<form action="{% url 'minus' %}" method="POST">
+				{% csrf_token %}
+				<td>
+					<input type="hidden" name="ret_rec_id" value="{{order.0}}">
+					<input type="hidden" name="batch_no" value="{{item.0}}">
+					<input type="hidden" name="price" value="{{item.3}}">
+					<input type="hidden" name="quantity" value="{{item.4}}">
+					<button type="submit" class="btn btn-success" style="width: 80%">-</button>
+				</td>
+			</form>
 		</tr>
 		{% endfor %}
 	</table>
 
-	<span class='pm-button btn-warning' id='4228A177413A82160F8DE0A709BADAD6' onclick="payme()">
+{% if flag %}
+<span class='pm-button btn-warning' id='4228A177413A82160F8DE0A709BADAD6' onclick="payme()">
   <span class="state active">
-    <input type="image" src="" width="131" height="37" value="Pay Now">
+    <input type="image" src="" width="80" height="100" value="Pay Now">
   </span>
   <span class="state clicked" style="display:none" >
     <input type="image" src="" width="131" height="37" value="Redirecting">
   </span>
 </span>
+{% endif %}
 {% endblock %}

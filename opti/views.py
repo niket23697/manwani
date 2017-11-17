@@ -220,7 +220,7 @@ def edit_item(request):
 	cursor.execute("update product set name='"+name+"',w_seller='"+wseller+"',ret_price='"+price+"',category='"+category+"' where batch_no='"+batchno+"';")
 	connection.commit()
 	connection.close()
-	return render(request, "shop.html")
+	return HttpResponseRedirect(reverse('shop'))
 
 
 def delete_item(request):
@@ -260,7 +260,17 @@ def mycart(request):
 	cursor=connection.cursor()
 	cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 	x=cursor.fetchone()
-	if x is not None:
+	x=list(x)
+	if int(x[2])==0:
+		print "EMPTY"
+	else:
+		print "NOT EMPTY"
+	# flag=1
+	# if x is None:
+	# 	flag=False
+	# if x is not None:
+	if int(x[2])!=0:
+		print("="*50+"\n" + str(x) +"\n"+'='*50)
 		cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 		ret_rec_id=list(cursor.fetchall())[0][0]
 		cursor.execute("select * from retail_record where ret_rec_id="+str(ret_rec_id)+";")
@@ -268,10 +278,13 @@ def mycart(request):
 		q="select product.batch_no, product.name, product.category, ret_price, prod_sale.quantity from product, prod_sale where product.batch_no=prod_sale.batch_no and prod_sale.ret_rec_id="+str(ret_rec_id)+";"
 		cursor.execute(q)
 		itemslist=list(cursor.fetchall())
-		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist})
+		flag=True
+		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist, 'flag':flag})
 	else:
+		print("="*50+"\nFalse flag\n"+'='*50)
+		flag=False
 		messages.error(request, 'No items in the cart.')
-		return render(request, 'mycart.html')
+		return render(request, 'mycart.html', {'flag': flag})
 
 def history(request):
 		return render(request, 'history.html')
@@ -280,29 +293,36 @@ def add_to_cart(request):
 	cursor=connection.cursor()
 	batch_no=request.GET.get('batch_no')
 	quantity=request.GET.get('quantity')
+	print type(int(quantity))
 	print "B:", batch_no
 	cursor.execute("select ret_price from product where batch_no="+str(batch_no)+";")
-	res=list(list(cursor.fetchall())[0])[0]
-	print "RES:",res
+	price=list(list(cursor.fetchall())[0])[0]
+	print "PRICE:",price, type(price)
 	cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
-	data = cursor.fetchone()
-	print "DATA:", data
-	if data is None:
+	pending = cursor.fetchone()
+	print "PENDING:", pending
+	if pending is None:
 		cursor.execute("insert into retail_record (ret_date,amt,username,status) values	(NOW(), 0,'"+request.user.username+"',1);")
 		connection.commit()
 	else:
+		print "ELSE"
 		cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
-		ret_rec_id=list(cursor.fetchall())[0][0]
-		q="select * from prod_sale where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";"
-		print q
+		pending_id=list(cursor.fetchall())[0][0]
+
+		# If the item to be added is already in a pending order
+		q="select * from prod_sale where ret_rec_id="+str(pending_id)+" and batch_no="+str(batch_no)+";"
+		# print q
 		cursor.execute(q)
-		res2=cursor.fetchall()
+		res2=cursor.fetchone()
+		print "RES2:",res2
 		if res2 is not None:
-			cursor.execute("update prod_sale set quantity=quantity+1 where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
-			cursor.execute("update retail_record set amt=amt+"+str(res)+" where ret_rec_id="+str(ret_rec_id)+";")
+			# update its number to +=quantity
+			cursor.execute("update prod_sale set quantity=quantity+"+str(quantity)+" where ret_rec_id="+str(pending_id)+" and batch_no="+str(batch_no)+";")
+			cursor.execute("update retail_record set amt=amt+"+str(price*int(quantity))+" where ret_rec_id="+str(pending_id)+";")
 		else:
-			cursor.execute("insert into prod_sale values ("+str(ret_rec_id)+","+str(batch_no)+","+str(quantity)+");")
-			cursor.execute("update retail_record set amt = amt+"+str(res)+" where ret_rec_id="+str(ret_rec_id)+";")
+			# create a new entry for that item
+			cursor.execute("insert into prod_sale values ("+str(pending_id)+","+str(batch_no)+","+str(quantity)+");")
+			cursor.execute("update retail_record set amt = amt+"+str(price*int(quantity))+" where ret_rec_id="+str(pending_id)+";")
 		connection.commit()
 	return HttpResponseRedirect(reverse('shop'))
 
@@ -372,3 +392,32 @@ def orders(request):
 	data = list(list(cursor.fetchall()))
 	return render(request, 'allorders.html', {'order_data': data})
 # def payment(request):
+
+def plus(request):
+	batch_no=request.POST['batch_no']
+	ret_rec_id=request.POST['ret_rec_id']
+	price=request.POST['price']
+	print (batch_no,ret_rec_id,price)
+	cursor=connection.cursor()
+	cursor.execute("update retail_record set amt=amt+"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
+	cursor.execute("update prod_sale set quantity=quantity+1 where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+	connection.commit()
+	connection.close()
+	return HttpResponseRedirect(reverse('mycart'))
+
+def minus(request):
+	batch_no=request.POST['batch_no']
+	ret_rec_id=request.POST['ret_rec_id']
+	price=request.POST['price']
+	quantity=request.POST['quantity']
+	cursor=connection.cursor()
+	if(int(quantity)==1):
+		cursor.execute("update retail_record set amt=amt-"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
+		cursor.execute("delete from prod_sale where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+		connection.commit()
+	else:
+		cursor.execute("update retail_record set amt=amt-"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
+		cursor.execute("update prod_sale set quantity=quantity-1 where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+		connection.commit()
+	connection.close()
+	return HttpResponseRedirect(reverse('mycart'))

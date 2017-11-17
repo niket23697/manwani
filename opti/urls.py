@@ -25,5 +25,7 @@ urlpatterns = [
 	url(r'^make_admin/$', views.make_admin, name="make_admin"),
 	url(r'^mycart/$', views.mycart, name="mycart"),
 	url(r'^add_to_cart/$', views.add_to_cart, name="add_to_cart"),
-	url(r'^orders/$', views.orders, name="orders")
+	url(r'^orders/$', views.orders, name="orders"),
+	url(r'^plus/$', views.plus, name="plus"),
+	url(r'^minus/$', views.minus, name="minus")
 	]
