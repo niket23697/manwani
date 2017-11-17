@@ -424,3 +424,16 @@ def minus(request):
 		connection.commit()
 	connection.close()
 	return HttpResponseRedirect(reverse('mycart'))
+
+def showfeed(request):
+	cursor=connection.cursor()
+	cursor.execute("select * from feedback")
+	data=list(cursor.fetchall())
+	# print data
+	send=[]
+	for item in data:
+		# item=list(item)
+		send.append(list(item))
+		print send[0]
+	#print data
+	return render(request, 'feed.html', {'feeds': send})

@@ -337,9 +337,15 @@ footer{
         <a class="nav-link" href="{% url 'orders' %}">Orders</a>
       </li>
       {% endif %}
+      {% if request.user.is_superuser %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'showfeed' %}">View Feedback</a>
+      </li>
+      {% else %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'contact' %}">Contact Us</a>
       </li>
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="/">About Us</a>
       </li>

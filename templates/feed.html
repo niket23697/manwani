@@ -1,0 +1,13 @@
+{% extends 'skeleton.html' %}
+{% block head %}
+	<title>Feedbacks</title>
+{% endblock %}
+
+{% block main %}
+	<h3 style="text-align: center;">Feedbacks</h3>
+	{% for item in feeds %}
+		<h6>{{item.0}}. submitted by {{item.2}}</h6>
+		<p>{{item.1}}</p>
+		<hr>
+	{% endfor %}
+{% endblock %}

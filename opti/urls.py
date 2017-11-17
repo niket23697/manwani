@@ -27,5 +27,6 @@ urlpatterns = [
 	url(r'^add_to_cart/$', views.add_to_cart, name="add_to_cart"),
 	url(r'^orders/$', views.orders, name="orders"),
 	url(r'^plus/$', views.plus, name="plus"),
-	url(r'^minus/$', views.minus, name="minus")
+	url(r'^minus/$', views.minus, name="minus"),
+	url(r'^showfeed/$', views.showfeed, name="showfeed"),
 	]
