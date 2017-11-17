@@ -3,7 +3,7 @@ from django.contrib import admin
 from . import views
 
 urlpatterns = [
-	url(r'^/$', views.home, name="home"),
+	url(r'^$', views.home, name="home"),
 	url(r'^home/$', views.home, name="home"),
 	url(r'^register/$', views.register, name="register"),
 	url(r'^register_user/$', views.register_user, name="register_user"),
