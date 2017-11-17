@@ -1,0 +1,64 @@
+{% extends 'skeleton.html' %}
+{% block head %}
+<script src= "https://www.payumoney.com/Api/REST/op/buttonScript" async="true" > </script>
+<script type="text/javascript">
+	function payme(){
+
+		window.PUM.setData("{{order.2}}", "{{order.0}}","Product");
+		window.PUM.pay();
+	}
+</script>
+<title>My Cart</title>
+{% endblock %}
+
+{% block main %}
+	<h2 style="color: #352943; text-align: center;">My Cart</h2>
+	<form class="form-horizontal" role="form" method="POST" style="color: #1a1a00">
+  		<div class="form-group">
+    		<label class="control-label col-sm-2" for="username">Order ID:</label>
+    		<div class="col-sm-10">
+      			<input type="text" name="orderid" class="form-control" value="{{order.0}}" id="orderid" readonly>
+    		</div>
+ 		</div>
+  		<div class="form-group">
+    		<label class="control-label col-sm-2" for="username">Username:</label>
+    		<div class="col-sm-10">
+      			<input type="text" name="username" class="form-control" value="{{order.3}}" id="username" placeholder="Username" readonly>
+    		</div>
+ 		</div>
+  		<div class="form-group">
+    		<label class="control-label col-sm-2" for="username">Total:</label>
+    		<div class="col-sm-10">
+      			<input type="text" name="total" class="form-control" value="{{order.2}}" id="total" placeholder="Username" readonly>
+    		</div>
+ 		</div>
+	</form>
+
+	<table>
+		<tr>
+			<th>Name</th>
+			<th>Category</th>
+			<th>Price</th>
+			<th>Quantity</th>
+			<th>&nbsp</th>
+			<th>&nbsp</th>
+		</tr>
+		{% for item in items %}
+		<tr>
+			<td>{{item.1}}</td>
+			<td>{{item.2}}</td>
+			<td>{{item.3}}</td>
+			<td>{{item.4}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<span class='pm-button btn-warning' id='4228A177413A82160F8DE0A709BADAD6' onclick="payme()">
+  <span class="state active">
+    <input type="image" src="" width="131" height="37" value="Pay Now">
+  </span>
+  <span class="state clicked" style="display:none" >
+    <input type="image" src="" width="131" height="37" value="Redirecting">
+  </span>
+</span>
+{% endblock %}

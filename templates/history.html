@@ -1,0 +1,25 @@
+{% extends 'skeleton.html' %}
+{% block head %}
+<title>Order History</title>
+{% endblock %}
+
+{% block main %}
+<h2 style="color: #352943; text-align: center;">Order History</h2>
+	<table>
+		<tr>
+			<th>Order ID</th>
+			<th>Timestamp</th>
+			<th>Total Amt.</th>
+			<th>&nbsp&nbsp&nbsp</th>
+		</tr>
+		{% for order in history %}
+			{% if not order.4 == 1 %}
+				<tr>
+					<td>{{order.0}}</td>
+					<td>{{order.1}}</td>
+					<td>{{order.2}}</td>
+				</tr>
+			{% endif %}
+		{% endfor %}
+	</table>
+{% endblock %}

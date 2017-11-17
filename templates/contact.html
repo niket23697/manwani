@@ -1,0 +1,26 @@
+{% extends 'skeleton.html' %}
+{% block head %}
+	<title>Contact Us</title>
+{% endblock %}
+
+{% block main %}
+	<h3>CONTACT US</h3>
+	{% if request.user.is_authenticated %}
+		<form method="POST" action="/feedback/" role="form">
+		{% csrf_token %}
+			<div class="row">
+				<div class="form-group">
+					<label for="fb">Feedback</label>
+					<input type="text" name="fb" class="form-control" id="fb" placeholder="Your feedback here..." rows="4">
+				</div>
+			</div>
+  		<div class="form-group"> 
+    		<div class="col-sm-offset-2 col-sm-10">
+      		<button type="submit" class="btn btn-default">Submit Feedback</button>
+    		</div>
+  		</div>
+		</form>
+	{% else %}
+		Log In to give your feedback.
+	{% endif %}
+{% endblock %}

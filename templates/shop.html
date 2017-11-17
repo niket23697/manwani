@@ -1,0 +1,56 @@
+{% extends "skeleton.html" %}
+{% block head %}
+	<title>Browse</title>
+{% endblock %}
+
+{% block main %}
+	{% if request.user.is_superuser %}
+		<h2>Inventory</h2>
+		<a href="{% url 'add_item_page' %}" class="btn">Add an item</a>
+	{% endif %}
+	<h2 style="text-align: center">Browse our shelves</h2>
+	{% for cat in inventory %}
+		<h5>{{cat.0}}</h5>
+		<table style="width: 80%; text-align: center; margin-left: auto; margin-right: auto;">
+			<tr>
+				<th>Batch No.</th>
+				<th>Name</th>
+				<th>Price</th>
+				{% if request.user.is_authenticated %}
+					{% if request.user.is_superuser %}
+						<th>Seller name</th>
+						<th>Current stock</th>
+						<th>&nbsp&nbsp&nbsp<th>
+					{% endif %}
+					<th>&nbsp&nbsp&nbsp&nbsp&nbsp</th>
+				{% endif %}
+			</tr>
+			{% for item in cat.1 %}
+			<tr>
+				<td>{{item.0}}</td>
+				<td>{{item.1}}</td>
+				<td>{{item.3}}</td>
+				{% if request.user.is_authenticated %}
+					{% if request.user.is_superuser %}
+						<td>{{item.2}}</td>
+						<td>{{item.7}}</td>
+						<td>
+							<form action="/edit_inv/" method="GET">
+								<input type="hidden" name="batchno" value="{{item.0}}">
+								<button type="submit" class="btn">Edit/Delete</button>
+							</form>
+						<td>
+					{% else %}
+					<td>
+						<form action="/add_to_cart/" method="GET">
+							<input type="number" name="quantity" min="1" max="{{item.7}}">
+							<input type="hidden" name="batch_no" value="{{item.0}}">	
+							<button type="submit" class="btn">Add to cart</button>
+						</form></td>
+					{% endif %}
+				{% endif %}
+			</tr>
+			{% endfor %}
+		</table>
+	{% endfor %}
+{% endblock %}
