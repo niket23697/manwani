@@ -92,13 +92,14 @@ def login(request):
 	return render(request, "home.html")
 
 def logout(request):
-	# cursor=connection.cursor()
-	# cursor.execute("select ret_rec_id from retail_record where username='"+request.user.username+"' and status=1;")
-	# olist=list(cursor.fetchall())
-	# for i in range(len(olist)):
-	# 	x=olist[i][0]
-	# 	cursor.execute("delete from retail_record where ret_rec_id="+str(x)+";")
-	# 	connection.commit()
+	cursor=connection.cursor()
+	cursor.execute("select ret_rec_id from retail_record where username='"+request.user.username+"' and status=1;")
+	olist=list(cursor.fetchall())
+	for i in range(len(olist)):
+		x=olist[i][0]
+		cursor.execute("delete from prod_sale where ret_rec_id="+str(x)+";")
+		cursor.execute("delete from retail_record where ret_rec_id="+str(x)+";")
+		connection.commit()
 
 	auth.logout(request)
 	messages.success(request, 'Successfully logged out.')
@@ -260,16 +261,17 @@ def mycart(request):
 	cursor=connection.cursor()
 	cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 	x=cursor.fetchone()
-	x=list(x)
-	if int(x[2])==0:
-		print "EMPTY"
-	else:
-		print "NOT EMPTY"
+	print "X:", x[2]
+	# x=list(x)
+	# if int(x[2])==0:
+	# 	print "EMPTY"
+	# else:
+	# 	print "NOT EMPTY"
 	# flag=1
 	# if x is None:
 	# 	flag=False
-	# if x is not None:
-	if int(x[2])!=0:
+	if x is not None and x[2]!=0:
+	# if int(x[2])!=0:
 		print("="*50+"\n" + str(x) +"\n"+'='*50)
 		cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 		ret_rec_id=list(cursor.fetchall())[0][0]
@@ -278,11 +280,11 @@ def mycart(request):
 		q="select product.batch_no, product.name, product.category, ret_price, prod_sale.quantity from product, prod_sale where product.batch_no=prod_sale.batch_no and prod_sale.ret_rec_id="+str(ret_rec_id)+";"
 		cursor.execute(q)
 		itemslist=list(cursor.fetchall())
-		flag=True
+		flag=1
 		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist, 'flag':flag})
 	else:
 		print("="*50+"\nFalse flag\n"+'='*50)
-		flag=False
+		flag=0
 		messages.error(request, 'No items in the cart.')
 		return render(request, 'mycart.html', {'flag': flag})
 
@@ -293,6 +295,7 @@ def add_to_cart(request):
 	cursor=connection.cursor()
 	batch_no=request.GET.get('batch_no')
 	quantity=request.GET.get('quantity')
+	cursor.execute("update product set curr_stock=curr_stock-"+str(quantity)+" where batch_no="+str(batch_no)+";")
 	print type(int(quantity))
 	print "B:", batch_no
 	cursor.execute("select ret_price from product where batch_no="+str(batch_no)+";")

@@ -1,4 +1,5 @@
 {% extends "skeleton.html" %}
+{% load staticfiles %}
 {% block head %}
 	<title>Home</title>
 {% endblock %}
@@ -12,13 +13,13 @@
   		</ol>
   		<div class="carousel-inner" role="listbox">
     		<div class="carousel-item active">
-      			<img class="d-block img-fluid" src="#" alt="Shop Front">
+      			<img class="d-block img-fluid img-responsive" src="{% static 'front.jpg' %}" alt="Shop Front">
     		</div>
     		<div class="carousel-item">
-      			<img class="d-block img-fluid" src="#" alt="Shelves 1">
+      			<img class="d-block img-fluid" src="#" alt="Image 2">
     		</div>
     		<div class="carousel-item">
-      			<img class="d-block img-fluid" src="#" alt="Shelves 2">
+      			<img class="d-block img-fluid" src="#" alt="Image 3">
     		</div>
   		</div>
   		<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">

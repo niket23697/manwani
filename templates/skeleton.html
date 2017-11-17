@@ -1,5 +1,5 @@
 <!doctype html>
-{% load static %}
+{% load staticfiles %}
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -352,8 +352,10 @@ footer{
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
+            {% if not request.user.is_superuser %}
             <a class="dropdown-item" href="{% url 'mycart' %}">Cart</a>
             <a class="dropdown-item" href="{% url 'history' %}">Orders</a>
+            {% endif %}
             <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
           </div>          
         </li>

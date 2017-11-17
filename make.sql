@@ -36,7 +36,8 @@ create table feedback(
 
 create table prod_sale(
 	ret_rec_id int,
-	batch_no int
+	batch_no int,
+	quantity int
 	);
 alter table prod_sale add primary key (ret_rec_id, sno);
 
