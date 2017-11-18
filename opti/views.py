@@ -97,6 +97,12 @@ def logout(request):
 	olist=list(cursor.fetchall())
 	for i in range(len(olist)):
 		x=olist[i][0]
+		cursor.execute("select batch_no, quantity from prod_sale where ret_rec_id="+str(x)+";")
+		info=list(cursor.fetchall())
+		print info
+		for elem in info:
+			print elem[0], elem[1]
+			cursor.execute("update product set curr_stock=curr_stock+"+str(elem[1])+" where batch_no="+str(elem[0])+";")
 		cursor.execute("delete from prod_sale where ret_rec_id="+str(x)+";")
 		cursor.execute("delete from retail_record where ret_rec_id="+str(x)+";")
 		connection.commit()
@@ -262,6 +268,7 @@ def mycart(request):
 	cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 	x=cursor.fetchone()
 	print "X:", x[2]
+	# print "X:", x[2]
 	# x=list(x)
 	# if int(x[2])==0:
 	# 	print "EMPTY"
@@ -270,16 +277,17 @@ def mycart(request):
 	# flag=1
 	# if x is None:
 	# 	flag=False
-	if x is not None and x[2]!=0:
+	if x is not None or x[2]!=0:
 	# if int(x[2])!=0:
 		print("="*50+"\n" + str(x) +"\n"+'='*50)
 		cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 		ret_rec_id=list(cursor.fetchall())[0][0]
 		cursor.execute("select * from retail_record where ret_rec_id="+str(ret_rec_id)+";")
 		order_info=list(list(cursor.fetchall())[0])
-		q="select product.batch_no, product.name, product.category, ret_price, prod_sale.quantity from product, prod_sale where product.batch_no=prod_sale.batch_no and prod_sale.ret_rec_id="+str(ret_rec_id)+";"
+		q="select product.batch_no, product.name, product.category, (product.ret_price)*(prod_sale.quantity), prod_sale.quantity from product, prod_sale where product.batch_no=prod_sale.batch_no and prod_sale.ret_rec_id="+str(ret_rec_id)+";"
 		cursor.execute(q)
 		itemslist=list(cursor.fetchall())
+		print itemslist
 		flag=1
 		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist, 'flag':flag})
 	else:
@@ -305,7 +313,10 @@ def add_to_cart(request):
 	pending = cursor.fetchone()
 	print "PENDING:", pending
 	if pending is None:
-		cursor.execute("insert into retail_record (ret_date,amt,username,status) values	(NOW(), 0,'"+request.user.username+"',1);")
+		cursor.execute("insert into retail_record (ret_date,amt,username,status) values	(NOW(),"+str(price)+" ,'"+request.user.username+"',1);")
+		cursor.execute("select ret_rec_id from retail_record where username='"+request.user.username+"' and status=1;")
+		new_ret_id=list(list(cursor.fetchall())[0])[0]
+		cursor.execute("insert into prod_sale (ret_rec_id, batch_no, quantity) values ("+str(new_ret_id)+", "+str(batch_no)+", "+str(quantity)+");")
 		connection.commit()
 	else:
 		print "ELSE"
@@ -404,6 +415,7 @@ def plus(request):
 	cursor=connection.cursor()
 	cursor.execute("update retail_record set amt=amt+"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
 	cursor.execute("update prod_sale set quantity=quantity+1 where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+	cursor.execute("update product set curr_stock=curr_stock-1 where batch_no="+str(batch_no)+";")
 	connection.commit()
 	connection.close()
 	return HttpResponseRedirect(reverse('mycart'))
@@ -413,14 +425,17 @@ def minus(request):
 	ret_rec_id=request.POST['ret_rec_id']
 	price=request.POST['price']
 	quantity=request.POST['quantity']
+	print "QUANTITY:", quantity
 	cursor=connection.cursor()
 	if(int(quantity)==1):
 		cursor.execute("update retail_record set amt=amt-"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
 		cursor.execute("delete from prod_sale where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+		cursor.execute("update product set curr_stock=curr_stock+1 where batch_no="+str(batch_no)+";")
 		connection.commit()
 	else:
 		cursor.execute("update retail_record set amt=amt-"+str(price)+" where ret_rec_id="+str(ret_rec_id)+";")
 		cursor.execute("update prod_sale set quantity=quantity-1 where ret_rec_id="+str(ret_rec_id)+" and batch_no="+str(batch_no)+";")
+		cursor.execute("update product set curr_stock=curr_stock+1 where batch_no="+str(batch_no)+";")
 		connection.commit()
 	connection.close()
 	return HttpResponseRedirect(reverse('mycart'))
