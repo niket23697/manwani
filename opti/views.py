@@ -290,6 +290,19 @@ def mycart(request):
 		print itemslist
 		flag=1
 		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist, 'flag':flag})
+	elif x[2]!=0:
+	# if int(x[2])!=0:
+		print("="*50+"\n" + str(x) +"\n"+'='*50)
+		cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
+		ret_rec_id=list(cursor.fetchall())[0][0]
+		cursor.execute("select * from retail_record where ret_rec_id="+str(ret_rec_id)+";")
+		order_info=list(list(cursor.fetchall())[0])
+		q="select product.batch_no, product.name, product.category, (product.ret_price)*(prod_sale.quantity), prod_sale.quantity from product, prod_sale where product.batch_no=prod_sale.batch_no and prod_sale.ret_rec_id="+str(ret_rec_id)+";"
+		cursor.execute(q)
+		itemslist=list(cursor.fetchall())
+		print itemslist
+		flag=1
+		return render(request, 'mycart.html', {'order':order_info, 'items':itemslist, 'flag':flag})
 	else:
 		print("="*50+"\nFalse flag\n"+'='*50)
 		flag=0
