@@ -267,7 +267,7 @@ def mycart(request):
 	cursor=connection.cursor()
 	cursor.execute("select * from retail_record where username='"+request.user.username+"' and status=1;")
 	x=cursor.fetchone()
-	print "X:", x[2]
+	# print "X:", x[2]
 	# print "X:", x[2]
 	# x=list(x)
 	# if int(x[2])==0:
